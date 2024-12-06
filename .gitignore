@@ -1,12 +1,17 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # Compiled output
-Front//dist
-Front//tmp
-Front//out-tsc
-Front//bazel-out
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
 
 # Node
+node_modules
+npm-debug.log
+yarn-error.log
+
 Front/node_modules
 Front/npm-debug.log
 Front/yarn-error.log

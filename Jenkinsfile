@@ -14,6 +14,22 @@ pipeline {
                 }
             }
         }
+
+        stage('Unzip VGG19 Model') {
+            steps {
+                script {
+                    echo "Unzipping vgg19_genre_classifier.zip..."
+                    
+                    // Navigate to the VGG19 directory and unzip the file
+                    bat """
+                    cd %WORKSPACE%\\Back\\Model_VGG19
+                    if exist vgg19_genre_classifier (rd /s /q vgg19_genre_classifier)
+                    mkdir vgg19_genre_classifier
+                    tar -xf vgg19_genre_classifier.zip -C vgg19_genre_classifier
+                    """
+                }
+            }
+        }
            
         stage('Build Docker Images') {
             steps {

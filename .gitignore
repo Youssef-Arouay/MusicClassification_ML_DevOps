@@ -1,10 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+Front/dist
+Front/tmp
+Front/out-tsc
+Front/bazel-out
 
 
 # Node
@@ -16,7 +16,8 @@ Front/node_modules
 Front/npm-debug.log
 Front/yarn-error.log
 
-Front/.angular
+Front/.angular/
+Front/.angular/*
 Front/.vscode
 
 # IDEs and editors

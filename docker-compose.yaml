@@ -17,3 +17,4 @@ services:
       context: ./Front
     ports:
       - "1000:4200"
+

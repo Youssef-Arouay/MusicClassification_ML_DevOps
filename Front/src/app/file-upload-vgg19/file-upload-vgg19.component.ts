@@ -22,21 +22,28 @@ export class FileUploadVGG19Component {
   onUpload(): void {
     if (!this.selectedFile) {
       this.errorMessage = 'Please select a file first!';
+      this.predictionResult = '';  // Clear the prediction result
       return;
     }
 
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
+    // Send the file to the backend API
     this.http.post<{ genre: string }>('http://127.0.0.1:5000/predict', formData)
       .subscribe({
         next: (response) => {
           this.predictionResult = `Predicted genre: ${response.genre}`;
-          this.errorMessage = '';
+          this.errorMessage = '';  // Clear any previous error
         },
         error: (error: HttpErrorResponse) => {
-          this.errorMessage = `Error: ${error.message}`;
-          this.predictionResult = '';
+          // Improved error message handling
+          if (error.status === 0) {
+            this.errorMessage = 'Server not reachable. Please check your backend server.';
+          } else {
+            this.errorMessage = `Error: ${error.message}`;
+          }
+          this.predictionResult = '';  // Clear the prediction result
         }
       });
   }

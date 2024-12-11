@@ -7,14 +7,11 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install any dependencies specified in requirements.txt
+# Install dependencies specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
 COPY . .
-
-# Ensure the upload folder exists
-RUN mkdir -p static/uploads
 
 # Expose the port the app runs on
 EXPOSE 5000

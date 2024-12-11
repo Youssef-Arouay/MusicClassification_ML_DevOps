@@ -1,15 +1,14 @@
 <div class="file-upload">
-    <h2>Upload Audio File</h2>
-    
-    <input type="file" (change)="onFileSelected($event)" accept=".wav" />
-    <button (click)="onUpload()" [disabled]="!selectedFile">Upload and Predict</button>
+  <h2>Upload Audio File (.wav)</h2>
   
-    <div *ngIf="predictionResult" class="result">
-      {{ predictionResult }}
-    </div>
-  
-    <div *ngIf="errorMessage" class="error">
-      {{ errorMessage }}
-    </div>
+  <input type="file" (change)="onFileSelected($event)" accept=".wav" />
+  <button (click)="onUpload()" [disabled]="!selectedFile">Upload and Predict using <b>VGG19 model</b></button>
+
+  <div *ngIf="predictionResult" class="result">
+    {{ predictionResult }}
   </div>
-  
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+</div>

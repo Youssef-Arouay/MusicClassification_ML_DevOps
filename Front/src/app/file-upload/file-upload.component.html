@@ -1,9 +1,30 @@
-<div class="file-upload">
+<!-- <div class="file-upload">
     <h2>Upload Audio File</h2>
     
     <input type="file" (change)="onFileSelected($event)" accept=".wav" />
     <button (click)="onUpload()" [disabled]="!selectedFile">Upload and Predict</button>
   
+    <div *ngIf="predictionResult" class="result">
+      {{ predictionResult }}
+    </div>
+  
+    <div *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </div>
+  </div>
+   -->
+
+
+   <div class="file-upload">
+    <h2>Upload Audio File (.wav)</h2>
+    
+    <input type="file" (change)="onFileSelected($event)" accept=".wav" />
+    <button (click)="onUpload()" [disabled]="!selectedFile || isLoading">Upload and Predict using SVM model</button>
+  
+    <div *ngIf="isLoading" class="loading">
+      Uploading and predicting... Please wait.
+    </div>
+    
     <div *ngIf="predictionResult" class="result">
       {{ predictionResult }}
     </div>

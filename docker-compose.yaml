@@ -1,20 +1,27 @@
 version: '3.9'
+
 services:
   svm_service:
     build:
       context: ./Back/Model_SVM
     ports:
       - "1001:5000"
+    restart: always
 
   vgg_service:
     build:
       context: ./Back/Model_VGG19
     ports:
       - "1002:5000"
+    restart: always
 
   frontend:
     build:
       context: ./Front
     ports:
       - "1000:4200"
+    restart: always
 
+networks:
+  default:
+    driver: bridge

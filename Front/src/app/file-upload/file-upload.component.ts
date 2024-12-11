@@ -10,12 +10,20 @@ export class FileUploadComponent {
   selectedFile: File | null = null;
   predictionResult: string = '';
   errorMessage: string = '';
+  isLoading: boolean = false;
+
+  private readonly apiUrl: string = 'http://127.0.0.1:5000/predict';
 
   constructor(private http: HttpClient) {}
 
   onFileSelected(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.selectedFile = event.target.files[0];
+    const file = event.target.files[0];
+    if (file && file.type === 'audio/wav') {
+      this.selectedFile = file;
+      this.errorMessage = '';
+    } else {
+      this.selectedFile = null;
+      this.errorMessage = 'Invalid file type. Please upload a .wav file.';
     }
   }
 
@@ -25,18 +33,22 @@ export class FileUploadComponent {
       return;
     }
 
+    this.isLoading = true; // Set loading state
+    this.predictionResult = '';
+    this.errorMessage = '';
+
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
-    this.http.post<{ genre: string }>('http://127.0.0.1:1000/predict', formData)
+    this.http.post<{ genre: string }>(this.apiUrl, formData)
       .subscribe({
         next: (response) => {
           this.predictionResult = `Predicted genre: ${response.genre}`;
-          this.errorMessage = '';
+          this.isLoading = false;
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage = `Error: ${error.message}`;
-          this.predictionResult = '';
+          this.isLoading = false;
         }
       });
   }

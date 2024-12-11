@@ -1,67 +1,33 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_COMPOSE_FILE = "docker-compose.yml"
-    }
-
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build') {
             steps {
                 script {
-                    git branch: 'main', url: 'https://github.com/Youssef-Arouay/MusicClassification_ML_DevOps'
+                    // Example: build Docker images
+                    sh 'docker-compose build'
                 }
             }
         }
-
-        stage('Unzip VGG19 Model') {
+        stage('Test') {
             steps {
                 script {
-                    echo "Unzipping vgg19_genre_classifier.zip..."
-                    sh '''
-                    cd Back/Model_VGG19
-                    mkdir -p vgg19_genre_classifier
-                    tar -xf vgg19_genre_classifier.zip -C vgg19_genre_classifier
-                    '''
+                    // Example: run tests
+                    sh 'docker-compose run --rm <service-name> pytest'
                 }
             }
         }
-
-        stage('Build Docker Images') {
+        stage('Deploy') {
             steps {
                 script {
-                    sh '''
-                    docker-compose build
-                    '''
-                }
-            }
-        }
-
-        stage('Run Containers') {
-            steps {
-                script {
-                    sh '''
-                    docker-compose up -d
-                    '''
-                }
-            }
-        }
-
-        stage('Health Check') {
-            steps {
-                script {
-                    def services = [
-                        "http://localhost:1000", // Frontend on port 4200 via Docker
-                        "http://localhost:1001", // Model SVM
-                        "http://localhost:1002"  // Model VGG19
-                    ]
-
-                    for (service in services) {
-                        sh '''
-                        curl --fail --silent --show-error ${service} || 
-                        (echo "Service ${service} is not healthy" && exit 1)
-                        '''
-                    }
+                    // Example: deploy or start the service
+                    sh 'docker-compose up -d'
                 }
             }
         }
@@ -69,20 +35,8 @@ pipeline {
 
     post {
         always {
-            script {
-                echo "Cleaning up resources..."
-                sh '''
-                docker-compose down || true
-                '''
-            }
-        }
-
-        success {
-            echo "Pipeline completed successfully!"
-        }
-
-        failure {
-            echo "Pipeline failed. Check the logs for details."
+            // Cleanup actions if needed
+            sh 'docker-compose down'
         }
     }
 }

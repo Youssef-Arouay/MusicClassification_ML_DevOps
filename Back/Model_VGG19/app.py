@@ -3,12 +3,16 @@ from flask_cors import CORS
 import librosa
 import numpy as np
 import io
+import os
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:1002"])  # Enable CORS for Angular's port
+CORS(app, origins=["http://localhost:4200"])  # Enable CORS for Angular's port
+
+CORS(app)  # This will allow all origins, but use cautiously
 
 # Load the VGG19 model
 model_path = 'vgg19_genre_classifier.h5'

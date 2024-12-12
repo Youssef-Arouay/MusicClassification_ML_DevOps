@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 script {
-                    // Checkout your repository into the default Jenkins workspace
+                    // Checkout  repository 
                     git branch: 'main', url: 'https://github.com/Youssef-Arouay/MusicClassification_ML_DevOps'
                 }
             }
@@ -20,7 +20,6 @@ pipeline {
                 script {
                     echo "Unzipping vgg19_genre_classifier.zip..."
 
-                    // PowerShell command to unzip the file in the same directory
                     bat """
                     powershell -Command "Expand-Archive -Path '%WORKSPACE%\\Back\\Model_VGG19\\vgg19_genre_classifier.zip' -DestinationPath '%WORKSPACE%\\Back\\Model_VGG19'"
                     """
@@ -36,12 +35,10 @@ pipeline {
                     docker build %WORKSPACE%\\Front -t frontend-app
                     """
                    
-                    // Build the SVM model backend image
                     bat """
                     docker build %WORKSPACE%\\Back\\Model_SVM -t model-svm-backend
                     """
                    
-                    // Build the VGG19 model backend image
                     bat """
                     docker build %WORKSPACE%\\Back\\Model_VGG19 -t model-vgg19-backend
                     """
@@ -54,12 +51,10 @@ pipeline {
                 script {
                     echo "Running Docker containers..."
                    
-                    // Run the frontend container
                     bat """
                     docker run -d --name frontend-container -p 1000:8080 frontend-app
                     """
                    
-                    // Run the SVM model backend container
                     bat """
                     docker run -d --name model-svm-container -p 1001:5000 model-svm-backend
                     """
@@ -75,14 +70,13 @@ pipeline {
         stage('Delay After Running Containers') {
             steps {
                 echo "Delaying for 1 hour after running containers..."
-                sleep time: 1, unit: 'HOURS'  // Delay for 1 hour
+                sleep time: 1, unit: 'HOURS' 
             }
         }
 
         stage('Health Check') {
             steps {
                 script {
-                    // Perform health checks for each service
                     def services = [
                         "http://localhost:1000", // Frontend
                         "http://localhost:1001", // Model SVM
@@ -105,14 +99,12 @@ pipeline {
             script {
                 echo "Cleaning up resources..."
                
-                // Stop each container
                 bat """
                 docker stop frontend-container || true
                 docker stop model-svm-container || true
                 docker stop model-vgg19-container || true
                 """
                
-                // Optionally remove containers
                 bat """
                 docker rm frontend-container || true
                 docker rm model-svm-container || true

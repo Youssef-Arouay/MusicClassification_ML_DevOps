@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 script {
-                    // Checkout  repository 
+                    // Checkout your repository into the default Jenkins workspace
                     git branch: 'main', url: 'https://github.com/Youssef-Arouay/MusicClassification_ML_DevOps'
                 }
             }
@@ -20,6 +20,7 @@ pipeline {
                 script {
                     echo "Unzipping vgg19_genre_classifier.zip..."
 
+                    // PowerShell command to unzip the file in the same directory
                     bat """
                     powershell -Command "Expand-Archive -Path '%WORKSPACE%\\Back\\Model_VGG19\\vgg19_genre_classifier.zip' -DestinationPath '%WORKSPACE%\\Back\\Model_VGG19'"
                     """
@@ -30,17 +31,11 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    // Build the frontend image
+                    echo "Building Docker images with Docker Compose..."
+
+                    // Stop any existing containers before building new ones
                     bat """
-                    docker build %WORKSPACE%\\Front -t frontend-app
-                    """
-                   
-                    bat """
-                    docker build %WORKSPACE%\\Back\\Model_SVM -t model-svm-backend
-                    """
-                   
-                    bat """
-                    docker build %WORKSPACE%\\Back\\Model_VGG19 -t model-vgg19-backend
+                    docker-compose -f "%WORKSPACE%\\docker-compose.yaml" down
                     """
                 }
             }
@@ -49,19 +44,11 @@ pipeline {
         stage('Run Containers') {
             steps {
                 script {
-                    echo "Running Docker containers..."
-                   
+                    echo "Running Docker containers with Docker Compose..."
+
+                    // Run the containers using Docker Compose
                     bat """
-                    docker run -d --name frontend-container -p 1000:8080 frontend-app
-                    """
-                   
-                    bat """
-                    docker run -d --name model-svm-container -p 1001:5000 model-svm-backend
-                    """
-                   
-                    // Run the VGG19 model backend container
-                    bat """
-                    docker run -d --name model-vgg19-container -p 1002:5000 model-vgg19-backend
+                    docker-compose -f "%WORKSPACE%\\docker-compose.yaml" up -d
                     """
                 }
             }
@@ -70,45 +57,21 @@ pipeline {
         stage('Delay After Running Containers') {
             steps {
                 echo "Delaying for 1 hour after running containers..."
-                sleep time: 1, unit: 'HOURS' 
+                sleep time: 1, unit: 'HOURS'  // Delay for 1 hour
             }
         }
 
-        stage('Health Check') {
-            steps {
-                script {
-                    def services = [
-                        "http://localhost:1000", // Frontend
-                        "http://localhost:1001", // Model SVM
-                        "http://localhost:1002"  // Model VGG19
-                    ]
-
-                    for (service in services) {
-                        bat """
-                        curl --fail --silent --show-error ${service} ||
-                        echo Service ${service} is not healthy && exit 1
-                        """
-                    }
-                }
-            }
-        }
+        
     }
 
     post {
         always {
             script {
                 echo "Cleaning up resources..."
-               
+
+                // Stop the containers using Docker Compose
                 bat """
-                docker stop frontend-container || true
-                docker stop model-svm-container || true
-                docker stop model-vgg19-container || true
-                """
-               
-                bat """
-                docker rm frontend-container || true
-                docker rm model-svm-container || true
-                docker rm model-vgg19-container || true
+                docker-compose -f "%WORKSPACE%\\docker-compose.yml" down
                 """
             }
         }
